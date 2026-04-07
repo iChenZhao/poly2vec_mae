@@ -1,0 +1,43 @@
+# OCF 隐式几何重建任务配置
+
+# 1. 路径设置
+paths:
+  data_path: "./data/data_1000.pt"             
+  save_dir: "./checkpoints/mlp_1000_v1"
+  test_indices_path: "./data/test_indices_1000.pt"
+
+# 2. 数据加载与采样
+sampling:
+  num_points: 7000            
+  ratios:
+    global: 0.1               
+    edge: 0.40                 
+    corner: 0.15               
+    inside: 0.35               
+  edge_jitter_std: 0.004      
+  corner_gauss_sigma: 0.002           
+
+# 3. 损失权重参数
+loss_weights:
+  global_weight: 1.0
+  edge_weight: 4.0           
+  corner_weight: 4.0          
+  inside_weight: 2.0          
+  ohem_ratio: 0.7
+  bce_weight: 1.0
+  dice_weight: 5.0          # 高频模型下，Dice依然是保底形状不崩溃的关键
+
+# 4. 模型架构参数 (GELU MLP)
+model:
+  embedding_dim: 384         # Poly2Vec/MAE 输出的宏观特征维度
+  freq_H: 63                 # 从数据体检中得知的频域实部高度
+  freq_W: 32                 # 频域实部宽度
+  hidden_dims: [512, 512, 256, 128] # 网络每层的维度设计，灵活可调
+
+# 5. 训练超参数
+training:
+  batch_size: 64              
+  num_epochs: 200
+  learning_rate: 5e-5
+  weight_decay: 1e-5
+  save_freq: 50               
